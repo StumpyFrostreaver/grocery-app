@@ -1,13 +1,20 @@
 from selenium.common.exceptions import NoSuchElementException
 
+
 class SeleniumUtils:
+    okay_to_not_find_elements = [
+        'pricing__before-price',
+        'pricing__until-date',
+    ]
     @staticmethod
     def safe_find_element(element, by, name):
         value = None
         try:
             value = element.find_element(by, name)
         except NoSuchElementException:
-            print(f"SeleniumUtils:safe_find_element: {name}")
+            if name not in SeleniumUtils.okay_to_not_find_elements:
+                print(f"WARN: SeleniumUtils:safe_find_element: Could not find element \'{name}\' in HTML:\n\n"
+                      f"{element.get_attribute('outerHTML')}")
         return value
 
     @staticmethod
