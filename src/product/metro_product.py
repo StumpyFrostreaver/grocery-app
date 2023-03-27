@@ -7,20 +7,20 @@ from src.common.string_utils import StringUtils
 
 class MetroProduct:
     __skip_attributes = [
-        'class',
-        'data-unit-increment',
-        'data-min-qty',
-        'data-max-qty',
-        'data-product-deletable',
-        'data-is',
-        'data-substitution-permission',
-        'data-criteo-on-load-beacon',
-        'data-criteo-on-click-beacon',
-        'data-criteo-on-view-beacon',
-        'data-criteo-on-basket-change-beacon',
-        'data-criteo-on-wish-list-beacon',
-        'data-criteo-format-level-on-load-beacon',
-        'data-criteo-format-level-on-view-beacon',
+        "class",
+        "data-unit-increment",
+        "data-min-qty",
+        "data-max-qty",
+        "data-product-deletable",
+        "data-is",
+        "data-substitution-permission",
+        "data-criteo-on-load-beacon",
+        "data-criteo-on-click-beacon",
+        "data-criteo-on-view-beacon",
+        "data-criteo-on-basket-change-beacon",
+        "data-criteo-on-wish-list-beacon",
+        "data-criteo-format-level-on-load-beacon",
+        "data-criteo-format-level-on-view-beacon",
     ]
 
     def __init__(self):
@@ -107,32 +107,32 @@ class MetroProduct:
 
         # Loop through the list and print the name and value of each attribute
         for attribute in attributes:
-            key = attribute['name']
-            value = StringUtils.csvify_field(attribute['value'])
+            key = attribute["name"]
+            value = StringUtils.csvify_field(attribute["value"])
 
-            if key == 'data-product-code':
+            if key == "data-product-code":
                 self.__code = value
-            elif key == 'data-is-inactive':
+            elif key == "data-is-inactive":
                 self.__inactive = value
-            elif key == 'data-product-name':
+            elif key == "data-product-name":
                 self.__name = value
-            elif key == 'data-product-category':
+            elif key == "data-product-category":
                 self.__category = value
-            elif key == 'data-product-category-id':
+            elif key == "data-product-category-id":
                 self.__category_id = value
-            elif key == 'data-category-url':
+            elif key == "data-category-url":
                 self.__category_url = value
-            elif key == 'data-product-brand':
+            elif key == "data-product-brand":
                 self.__brand = value
-            elif key == 'data-age-restriction':
+            elif key == "data-age-restriction":
                 self.__age_restriction = value
-            elif key == 'data-product-alcohol':
+            elif key == "data-product-alcohol":
                 self.__alcohol = value
             elif key in self.__skip_attributes:
                 pass
-                # print(f'Skipping attribute: \'{key}\' with value: \'{value}\'')
+                # print(f"Skipping attribute: '{key}' with value: '{value}'")
             else:
-                print(f'Unknown attribute: \'{key}\' with value: \'{value}\'')
+                print(f"Unknown attribute: '{key}' with value: '{value}'")
 
         # We can consolidate this, but for now, its nice to debug...
         price = SeleniumUtils.safe_find_element_text(listing, By.CLASS_NAME, "price-update")

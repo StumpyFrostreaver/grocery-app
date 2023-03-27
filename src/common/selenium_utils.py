@@ -1,4 +1,5 @@
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.remote.webelement import WebElement
 
 
 class SeleniumUtils:
@@ -6,20 +7,22 @@ class SeleniumUtils:
         'pricing__before-price',
         'pricing__until-date',
     ]
+
     @staticmethod
-    def safe_find_element(element, by, name):
+    def safe_find_element(element, by, name, show_warning=False) -> WebElement:
         value = None
         try:
             value = element.find_element(by, name)
         except NoSuchElementException:
-            if name not in SeleniumUtils.okay_to_not_find_elements:
-                print(f"WARN: SeleniumUtils:safe_find_element: Could not find element \'{name}\' in HTML:\n\n"
-                      f"{element.get_attribute('outerHTML')}")
+            if show_warning and \
+               name not in SeleniumUtils.okay_to_not_find_elements:
+                print(f"\nWARN: SeleniumUtils:safe_find_element: Could not find element \'{name}\' in HTML:\n"
+                      f"{element.get_attribute('outerHTML')}\n")
         return value
 
     @staticmethod
-    def safe_find_element_text(element, by, name):
-        value = SeleniumUtils.safe_find_element(element, by, name)
+    def safe_find_element_text(element, by, name, show_warning=False) -> str:
+        value = SeleniumUtils.safe_find_element(element, by, name, show_warning)
         if value is None:
             return ""
         return value.text

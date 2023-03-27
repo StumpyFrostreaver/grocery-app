@@ -14,6 +14,9 @@ class StringUtils:
 
     @staticmethod
     def csvify_field(field):
-        csvified_field = field
+        if field is None or StringUtils.is_blank(field) or str(field).lower() == "none":
+            field = ''
+        csvified_field = str(field)
+        csvified_field = csvified_field.replace('"', '""')
         csvified_field = f"\"{csvified_field}\""
         return csvified_field

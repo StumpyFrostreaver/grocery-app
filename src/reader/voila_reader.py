@@ -24,7 +24,7 @@ class VoilaReader:
         if StringUtils.is_something(self.__url):
             # Set up the Selenium WebDriver in headless mode
             options = Options()
-            options.add_argument('--headless')
+            options.add_argument("--headless")
             driver = webdriver.Chrome(options=options)
             driver.get(self.__url)
             # site_content = driver.find_element(By.CLASS_NAME, 'site--content')
@@ -36,7 +36,7 @@ class VoilaReader:
             page = 1
 
             while True:
-                print(f'\n\nPage {page}:\n\n\n')
+                print(f"\n\nPage {page}:\n\n\n")
                 products = self.__parse_page(driver)
                 scroll_to = current_scroll + scroll_amount
                 driver.execute_script(f"window.scrollTo(0, {scroll_to});")
@@ -57,14 +57,7 @@ class VoilaReader:
 
     def __parse_page(self, driver):
         products = []
-
-        # # Find all the product listings on the page
-        # results = driver.find_element(By.CLASS_NAME, "layout__Container-sc-nb1ebc-0")
-        # print()
-        # listings = results.find_elements(By.CLASS_NAME, 'base__BoxCard-sc-1mnb0pd-5')
-        #
-        # items_container = driver.find_element(By.XPATH, "//div[@data-synthetics='product-list']")
-        items = driver.find_elements(By.CLASS_NAME, 'base__BoxCard-sc-1mnb0pd-5')
+        items = driver.find_elements(By.CLASS_NAME, "base__BoxCard-sc-1mnb0pd-5")
 
         item_count = 1
         print(f"Found Elements: {len(items)}")
