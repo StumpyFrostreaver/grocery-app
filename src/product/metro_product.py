@@ -156,7 +156,7 @@ class MetroProduct(BaseProduct):
 
         # We can consolidate this, but for now, its nice to debug...
         unit_details = SeleniumUtils.safe_find_element_text(listing, By.CLASS_NAME, "head__unit-details")
-        price = SeleniumUtils.safe_find_element_text(listing, By.CLASS_NAME, "price-update")
+        price = SeleniumUtils.safe_find_element_text(listing, By.CLASS_NAME, "pricing__sale-price")
         ppu = SeleniumUtils.safe_find_element_text(listing, By.CLASS_NAME, "pricing__secondary-price")
         price_before_sale = SeleniumUtils.safe_find_element_text(listing, By.CLASS_NAME, "pricing__before-price")
         on_sale_until = SeleniumUtils.safe_find_element_text(listing, By.CLASS_NAME, "pricing__until-date")

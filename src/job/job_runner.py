@@ -1,4 +1,4 @@
-from src.common import reader_types
+from src.common.constants import reader_types
 
 from src.reader.base_reader import BaseReader
 
@@ -11,13 +11,21 @@ class JobRunner:
     def __init__(self):
         self.__job = None
         self.__products = None
+        self.__folder = None
         pass
 
+    def with_output_folder(self, folder):
+        self.__folder = folder
+        return self
+
     def run_job(self, job):
+        print(f"=------------------ STARTING JOB:    {job.name} ------------------=")
         self.__job = job
         self.__products = None
         reader = self.__create_reader()
         self.__products = reader.parse()
+        self.__dump_to_csv()
+        print(f"=------------------ JOB COMPLETED:    {job.name} ------------------=\n")
         return self.__products
 
     def __create_reader(self) -> BaseReader:
@@ -35,7 +43,9 @@ class JobRunner:
 
         return reader
 
-    def dump_to_csv(self, file_name):
+    def __dump_to_csv(self):
+        file_name = f"{self.__folder}{self.__job.reader_type}_{self.__job.product_type}.csv"
+        file_name = file_name.replace(' ', '_')
         product_count = 0
         with open(file_name, 'w', encoding="utf-8", newline='') as file:
             for product in self.__products:

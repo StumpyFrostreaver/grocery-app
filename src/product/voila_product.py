@@ -20,15 +20,14 @@ class VoilaProduct(BaseProduct):
         self.__price_per_unit = None
         self.__price = None
         self.__details_page = None
-
         self.__kosher = StringUtils.csvify_field(False)
         self.__local = StringUtils.csvify_field(False)
         self.__organic = StringUtils.csvify_field(False)
         self.__peanut_free = StringUtils.csvify_field(False)
         self.__lactose_free = StringUtils.csvify_field(False)
+        self.__gluten_free = StringUtils.csvify_field(False)
         self.__vegan = StringUtils.csvify_field(False)
         self.__vegetarian = StringUtils.csvify_field(False)
-
         self.__sku = None
 
     @property
@@ -76,6 +75,10 @@ class VoilaProduct(BaseProduct):
         return self.__lactose_free
 
     @property
+    def gluten_free(self):
+        return self.__gluten_free
+
+    @property
     def vegan(self):
         return self.__vegan
 
@@ -91,14 +94,14 @@ class VoilaProduct(BaseProduct):
     def as_csv_header():
         return "date, name, size, price_per_unit, price, details_page, " \
                "kosher, local, organic, " \
-               "peanut_free, lactose_free, vegan, vegetarian, " \
+               "peanut_free, lactose_free, gluten_free, vegan, vegetarian, " \
                "sku"
 
     @property
     def as_csv(self):
         return f"{self.date}, {self.name}, {self.size}, {self.price_per_unit}, {self.price}, {self.__details_page}, " \
                f"{self.kosher}, {self.local}, {self.organic}, " \
-               f"{self.peanut_free}, {self.lactose_free}, {self.vegan}, {self.vegetarian}, " \
+               f"{self.peanut_free}, {self.lactose_free}, {self.gluten_free}, {self.vegan}, {self.vegetarian}, " \
                f"{self.__sku}"
 
     def parse_listing(self, listing):
@@ -121,6 +124,8 @@ class VoilaProduct(BaseProduct):
                         self.__peanut_free = StringUtils.csvify_field(True)
                     elif span_text == "lactose free":
                         self.__lactose_free = StringUtils.csvify_field(True)
+                    elif span_text == "gluten free":
+                        self.__gluten_free = StringUtils.csvify_field(True)
                     elif span_text == "vegan":
                         self.__vegan = StringUtils.csvify_field(True)
                     elif span_text == "vegetarian":

@@ -46,15 +46,15 @@ class NoFrillsReader(BaseReader):
                 if page == 1:
                     time.sleep(5)
                     button = driver.find_element(By.CLASS_NAME, "modal-dialog__content__close")
-                    button.click()
+                    SeleniumUtils.safe_button_click(button)
                     button = driver.find_element(By.CLASS_NAME, "lds__privacy-policy__btnClose")
-                    button.click()
+                    SeleniumUtils.safe_button_click(button)
 
                 load_more_button = SeleniumUtils.safe_find_element(driver, By.CLASS_NAME, "load-more-button")
                 if load_more_button:
                     button = SeleniumUtils.safe_find_element(load_more_button, By.CLASS_NAME, "primary-button")
                     if button:
-                        button.click()
+                        SeleniumUtils.safe_button_click(button)
                     else:
                         print("ERROR: Could not find a button on the 'load-more-button' element.")
                         more_to_read = False
@@ -90,9 +90,12 @@ class NoFrillsReader(BaseReader):
                 all_listings += f"ERR - Listing: {listing_count} -- {listing.get_attribute('outerHTML')}\n"
                 print(f"Listing: {listing_count} {ex}")
 
-        print(f"Processed {listing_count} records with {error_count} errors.\nErrors on Listings: {error_listings}")
-        with open('../csv_files/mark/nofrills_all_listings.csv', 'w', newline='') as file:
-            file.write(all_listings)
+        print(f"Processed {listing_count} records with {error_count} errors.")
+        if error_count > 0:
+            print(f"\nErrors on Listings: {error_listings}")
+
+        # with open('../csv_files/mark/nofrills_all_listings.csv', 'w', newline='') as file:
+        #     file.write(all_listings)
         return products
 
 

@@ -1,0 +1,4 @@
+reader_type, product_type, url
+"metro", "kidney_beans", "https://www.metro.ca/en/online-grocery/search?filter=kidney+beans&freeText=true"
+"no_frills", "kidney_beans", "https://www.nofrills.ca/search?search-bar=kidney%20beans"
+"voila", "kidney_beans", "https://voila.ca/products/search?q=kidney%20beans"

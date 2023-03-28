@@ -35,14 +35,13 @@ class VoilaReader(BaseReader):
                 driver.execute_script(f"window.scrollTo(0, {scroll_to});")
                 time.sleep(1)
                 current_scroll = scroll_to
+
+                # If we have items in both our lists, lets check to see if the last one we read this time
+                # is the same as the last one we read last time. If it is, then we are done since the last
+                # item is the same.
                 if len(all_products) > 0 and len(products) > 0:
                     if all_products[len(all_products)-1].as_csv == products[len(products)-1].as_csv:
                         break
-                    else:
-                        pass
-                else:
-                    print(f"** WARNING ** -- A Collection Is Empty: all_products count: {len(all_products)}  "
-                          f"products count: {len(products)}")
 
                 all_products.extend(products)
                 print(f"Page {page}: Currently at {len(all_products)} total items.")
