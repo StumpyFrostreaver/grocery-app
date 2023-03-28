@@ -1,11 +1,15 @@
+from datetime import date
+
 from selenium.webdriver.common.by import By
 
-from src.common.metro_utils import MetroUtils
-from src.common.selenium_utils import SeleniumUtils
 from src.common.string_utils import StringUtils
+from src.common.selenium_utils import SeleniumUtils
+from src.common.metro_utils import MetroUtils
+
+from src.product.base_product import BaseProduct
 
 
-class MetroProduct:
+class MetroProduct(BaseProduct):
     __skip_attributes = [
         "class",
         "data-unit-increment",
@@ -24,6 +28,8 @@ class MetroProduct:
     ]
 
     def __init__(self):
+        super().__init__()
+        self.__date = None
         self.__code = None
         self.__inactive = None
         self.__name = None
@@ -33,10 +39,15 @@ class MetroProduct:
         self.__brand = None
         self.__age_restriction = None
         self.__alcohol = None
+        self.__unit_details = None
         self.__price = None
         self.__price_per_unit = None
         self.__price_before_sale = None
         self.__on_sale_until = None
+
+    @property
+    def date(self):
+        return self.__date
 
     @property
     def code(self):
@@ -75,6 +86,10 @@ class MetroProduct:
         return self.__alcohol
 
     @property
+    def unit_details(self):
+        return self.__unit_details
+
+    @property
     def price(self):
         return self.__price
 
@@ -92,17 +107,22 @@ class MetroProduct:
 
     @staticmethod
     def as_csv_header():
-        return "code, inactive, name, category, category_id, category_url, " \
-               "brand, age_restriction, alcohol, price, price_per_unit, " \
-               "price_before_sale, on_sale_until"
+        return "date, code, inactive, name, " \
+               "category, category_id, category_url, " \
+               "brand, age_restriction, alcohol, unit_details, " \
+               "price, price_per_unit, price_before_sale, on_sale_until"
 
     @property
     def as_csv(self):
-        return f"{self.code}, {self.inactive}, {self.name}, {self.category}, {self.category_id}, {self.category_url}, " \
-               f"{self.brand}, {self.age_restriction}, {self.alcohol}, {self.price}, {self.price_per_unit}, " \
-               f"{self.price_before_sale}, {self.on_sale_until}"
+        return f"{self.date}, {self.code}, {self.inactive}, {self.name}," \
+               f" {self.category}, {self.category_id}, {self.category_url}, " \
+               f"{self.brand}, {self.age_restriction}, {self.alcohol}, {self.unit_details}," \
+               f" {self.price}, {self.price_per_unit}, {self.price_before_sale}, {self.on_sale_until}"
 
     def parse_listing(self, listing):
+        self.__date = StringUtils.csvify_field(date.today().strftime("%Y-%m-%d"))
+
+        # print(f"Listing: {listing.get_attribute('outerHTML')}")
         attributes = listing.get_property("attributes")
 
         # Loop through the list and print the name and value of each attribute
@@ -135,11 +155,13 @@ class MetroProduct:
                 print(f"Unknown attribute: '{key}' with value: '{value}'")
 
         # We can consolidate this, but for now, its nice to debug...
+        unit_details = SeleniumUtils.safe_find_element_text(listing, By.CLASS_NAME, "head__unit-details")
         price = SeleniumUtils.safe_find_element_text(listing, By.CLASS_NAME, "price-update")
         ppu = SeleniumUtils.safe_find_element_text(listing, By.CLASS_NAME, "pricing__secondary-price")
         price_before_sale = SeleniumUtils.safe_find_element_text(listing, By.CLASS_NAME, "pricing__before-price")
         on_sale_until = SeleniumUtils.safe_find_element_text(listing, By.CLASS_NAME, "pricing__until-date")
 
+        self.__unit_details = StringUtils.csvify_field(unit_details)
         self.__price = StringUtils.csvify_field(price)
         self.__price_per_unit = StringUtils.csvify_field(ppu)
         self.__price_before_sale = StringUtils.csvify_field(MetroUtils.get_price_from_price_string(price_before_sale))

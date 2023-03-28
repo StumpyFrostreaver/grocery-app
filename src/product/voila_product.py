@@ -1,21 +1,39 @@
+from datetime import date
+
 from selenium.webdriver.common.by import By
 
-from src.common.selenium_utils import SeleniumUtils
 from src.common.string_utils import StringUtils
+from src.common.selenium_utils import SeleniumUtils
 from src.common.voila_utils import VoilaUtils
 
+from src.product.base_product import BaseProduct
 
-class VoilaProduct:
+
+class VoilaProduct(BaseProduct):
     __skip_attributes = [
     ]
 
     def __init__(self):
+        self.__date = None
         self.__name = None
         self.__size = None
         self.__price_per_unit = None
         self.__price = None
         self.__details_page = None
+
+        self.__kosher = StringUtils.csvify_field(False)
+        self.__local = StringUtils.csvify_field(False)
+        self.__organic = StringUtils.csvify_field(False)
+        self.__peanut_free = StringUtils.csvify_field(False)
+        self.__lactose_free = StringUtils.csvify_field(False)
+        self.__vegan = StringUtils.csvify_field(False)
+        self.__vegetarian = StringUtils.csvify_field(False)
+
         self.__sku = None
+
+    @property
+    def date(self):
+        return self.__date
 
     @property
     def name(self):
@@ -38,18 +56,78 @@ class VoilaProduct:
         return self.__details_page
 
     @property
+    def kosher(self):
+        return self.__kosher
+
+    @property
+    def local(self):
+        return self.__local
+
+    @property
+    def organic(self):
+        return self.__organic
+
+    @property
+    def peanut_free(self):
+        return self.__peanut_free
+
+    @property
+    def lactose_free(self):
+        return self.__lactose_free
+
+    @property
+    def vegan(self):
+        return self.__vegan
+
+    @property
+    def vegetarian(self):
+        return self.__vegetarian
+
+    @property
     def sku(self):
         return self.__sku
 
     @staticmethod
     def as_csv_header():
-        return "name, size, price_per_unit, price, details_page, sku"
+        return "date, name, size, price_per_unit, price, details_page, " \
+               "kosher, local, organic, " \
+               "peanut_free, lactose_free, vegan, vegetarian, " \
+               "sku"
 
     @property
     def as_csv(self):
-        return f"{self.name}, {self.size}, {self.price_per_unit}, {self.price}, {self.__details_page}, {self.__sku}"
+        return f"{self.date}, {self.name}, {self.size}, {self.price_per_unit}, {self.price}, {self.__details_page}, " \
+               f"{self.kosher}, {self.local}, {self.organic}, " \
+               f"{self.peanut_free}, {self.lactose_free}, {self.vegan}, {self.vegetarian}, " \
+               f"{self.__sku}"
 
     def parse_listing(self, listing):
+        self.__date = StringUtils.csvify_field(date.today().strftime("%Y-%m-%d"))
+
+        product_attributes = SeleniumUtils.safe_find_element(listing, By.CLASS_NAME, "base__ProductAttributes-sc-1mnb0pd-25")
+        if product_attributes:
+            spans = product_attributes.find_elements(By.TAG_NAME, "span")
+            if spans:
+                for span in spans:
+                    span_text = span.get_attribute("title")
+                    span_text = span_text.lower()
+                    if span_text == "kosher":
+                        self.__kosher = StringUtils.csvify_field(True)
+                    elif span_text == "local":
+                        self.__local = StringUtils.csvify_field(True)
+                    elif span_text == "organic":
+                        self.__organic = StringUtils.csvify_field(True)
+                    elif span_text == "peanut free":
+                        self.__peanut_free = StringUtils.csvify_field(True)
+                    elif span_text == "lactose free":
+                        self.__lactose_free = StringUtils.csvify_field(True)
+                    elif span_text == "vegan":
+                        self.__vegan = StringUtils.csvify_field(True)
+                    elif span_text == "vegetarian":
+                        self.__vegetarian = StringUtils.csvify_field(True)
+                    else:
+                        print(f"WARNING: Unhandled attribute '{span_text}'")
+
         name_element = SeleniumUtils.safe_find_element(listing, By.CLASS_NAME, "text__Text-sc-6l1yjp-0")
         self.__name = StringUtils.csvify_field(name_element.text)
 

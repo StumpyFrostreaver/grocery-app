@@ -5,30 +5,24 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 
 from src.common.string_utils import StringUtils
+
+from src.reader.base_reader import BaseReader
 from src.product.voila_product import VoilaProduct
 
 
-class VoilaReader:
-    def __init__(self):
-        self.__url = None
+class VoilaReader(BaseReader):
+    def __init__(self, job):
+        super().__init__(job)
 
-    def with_url(self, url):
-        self.__url = url
-        return self
-
-    def parse_bs(self):
-        pass
     def parse(self):
         all_products = []
 
-        if StringUtils.is_something(self.__url):
+        if StringUtils.is_something(self.url):
             # Set up the Selenium WebDriver in headless mode
             options = Options()
             options.add_argument("--headless")
             driver = webdriver.Chrome(options=options)
-            driver.get(self.__url)
-            # site_content = driver.find_element(By.CLASS_NAME, 'site--content')
-            # print(site_content.get_attribute('outerHTML'))
+            driver.get(self.url)
 
             current_scroll = 1600
             scroll_to = 0
@@ -36,7 +30,6 @@ class VoilaReader:
             page = 1
 
             while True:
-                print(f"\n\nPage {page}:\n\n\n")
                 products = self.__parse_page(driver)
                 scroll_to = current_scroll + scroll_amount
                 driver.execute_script(f"window.scrollTo(0, {scroll_to});")
@@ -45,24 +38,31 @@ class VoilaReader:
                 if len(all_products) > 0 and len(products) > 0:
                     if all_products[len(all_products)-1].as_csv == products[len(products)-1].as_csv:
                         break
+                    else:
+                        pass
                 else:
                     print(f"** WARNING ** -- A Collection Is Empty: all_products count: {len(all_products)}  "
                           f"products count: {len(products)}")
 
                 all_products.extend(products)
-                print(f"Currently at {len(all_products)} total items.")
+                print(f"Page {page}: Currently at {len(all_products)} total items.")
                 page += 1
 
-        return all_products
+        seen_skus = []
+        filtered_products = []
+        for product in all_products:
+            if product.sku not in seen_skus:
+                filtered_products.append(product)
+                seen_skus.append(product.sku)
+        print(f"Read {len(all_products)} items but filtered list to {len(filtered_products)} unique items.")
+        return filtered_products
 
     def __parse_page(self, driver):
         products = []
         items = driver.find_elements(By.CLASS_NAME, "base__BoxCard-sc-1mnb0pd-5")
 
         item_count = 1
-        print(f"Found Elements: {len(items)}")
         for listing in items:
-            print(f"Processing Item: {item_count}")
             product = VoilaProduct()
             product.parse_listing(listing)
             products.append(product)

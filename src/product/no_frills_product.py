@@ -1,19 +1,21 @@
 import json
-
 from datetime import date
 
 from selenium.webdriver.common.by import By
 
-from src.common.selenium_utils import SeleniumUtils
 from src.common.string_utils import StringUtils
+from src.common.selenium_utils import SeleniumUtils
+
+from src.product.base_product import BaseProduct
 
 
-class NoFrillsProduct:
+class NoFrillsProduct(BaseProduct):
     __skip_attributes = [
         "productPosition",
     ]
 
     def __init__(self):
+        super().__init__()
         self.__date = None
         self.__article_no = None
         self.__product_id = None
@@ -152,7 +154,7 @@ class NoFrillsProduct:
 
         div = listing.find_element(By.TAG_NAME, "div")
         self.__article_no = StringUtils.csvify_field(div.get_attribute("data-track-article-number"))
-        self.__product_id = StringUtils.csvify_field(div.get_attribute("data-track-article-number"))
+        self.__product_id = StringUtils.csvify_field(div.get_attribute("data-track-product-id"))
 
         self.__list_price = StringUtils.csvify_field(SeleniumUtils.safe_find_element_text(listing, By.CLASS_NAME, "selling-price-list__item__price--now-price__value"))
         self.__list_price_unit = StringUtils.csvify_field(SeleniumUtils.safe_find_element_text(listing, By.CLASS_NAME, "selling-price-list__item__price--now-price__unit"))

@@ -6,26 +6,24 @@ from selenium.webdriver.common.by import By
 
 from src.common.selenium_utils import SeleniumUtils
 from src.common.string_utils import StringUtils
+
+from src.reader.base_reader import BaseReader
 from src.product.metro_product import MetroProduct
 
 
-class MetroReader:
-    def __init__(self):
-        self.__url = None
-
-    def with_url(self, url):
-        self.__url = url
-        return self
+class MetroReader(BaseReader):
+    def __init__(self, job):
+        super().__init__(job)
 
     def parse(self):
         all_products = []
 
-        if StringUtils.is_something(self.__url):
+        if StringUtils.is_something(self.url):
             # Set up the Selenium WebDriver in headless mode
             options = Options()
             options.add_argument("--headless")
             driver = webdriver.Chrome(options=options)
-            driver.get(self.__url)
+            driver.get(self.url)
 
             # may not be needed (this time.sleep(3))
             time.sleep(3)
@@ -37,7 +35,9 @@ class MetroReader:
 
             more_to_read = True
 
+            page = 0
             while more_to_read:
+                page += 1
                 products = self.__parse_page(driver)
                 all_products.extend(products)
 
@@ -55,6 +55,7 @@ class MetroReader:
                             more_to_read = False
                         break
 
+                print(f"Finished Page {page}. {len(all_products)} so far...")
             return all_products
 
     def __parse_page(self, driver):

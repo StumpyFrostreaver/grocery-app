@@ -7,26 +7,24 @@ from selenium.webdriver.common.by import By
 
 from src.common.selenium_utils import SeleniumUtils
 from src.common.string_utils import StringUtils
+
+from src.reader.base_reader import BaseReader
 from src.product.no_frills_product import NoFrillsProduct
 
 
-class NoFrillsReader:
-    def __init__(self):
-        self.__url = None
-
-    def with_url(self, url):
-        self.__url = url
-        return self
+class NoFrillsReader(BaseReader):
+    def __init__(self, job):
+        super().__init__(job)
 
     def parse(self):
         all_products = []
 
-        if StringUtils.is_something(self.__url):
+        if StringUtils.is_something(self.url):
             # Set up the Selenium WebDriver in headless mode
             options = Options()
-            #options.add_argument("--headless")
+            options.add_argument("--headless")
             driver = webdriver.Chrome(options=options)
-            driver.get(self.__url)
+            driver.get(self.url)
 
             # Wait for the page to load
             listings = None
@@ -75,8 +73,7 @@ class NoFrillsReader:
 
         # Find all the product listings on the page
         # TODO: Change to use SAFE FIND BY ELEMENT
-        results = driver.find_element(By.CLASS_NAME, "product-grid__results__products")
-        #listings = results.find_elements(By.CLASS_NAME, "quantity-selector--product-tile")
+        results = SeleniumUtils.safe_find_element(driver, By.CLASS_NAME, "product-grid__results__products")
         listings = results.find_elements(By.CLASS_NAME, "product-tile-group__list__item")
 
         listing_count = 0
